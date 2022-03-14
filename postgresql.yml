@@ -44,10 +44,10 @@
     command: /usr/sbin/update-alternatives --install /usr/bin/pg_config pgsql-pg_config /usr/pgsql-13/bin/pg_config 1300
     when: not (pg_config.stdout is search('pgsql-13'))
       
-  - name: Install psycopg2
-    pip:
-      name: psycopg2-binary
-      state: present
+#  - name: Install psycopg2
+#    pip:
+#      name: psycopg2-binary
+#      state: present
   
   - name: Ensure PostgreSQL data directory exists
     file:
