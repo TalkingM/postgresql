@@ -25,12 +25,12 @@
     args: 
       warn: no
     
-  - name: Install Postgresql 13
+  - name: Install Postgresql 14
     yum:
       name:
-        - postgresql13-server
-        - postgresql13-contrib
-        - postgresql13-devel
+        - postgresql14-server
+        - postgresql14-contrib
+        - postgresql14-devel
       state: latest
       update_cache: yes
 
@@ -41,8 +41,8 @@
     ignore_errors: true
 
   - name: ensure pg_config is set
-    command: /usr/sbin/update-alternatives --install /usr/bin/pg_config pgsql-pg_config /usr/pgsql-13/bin/pg_config 1300
-    when: not (pg_config.stdout is search('pgsql-13'))
+    command: /usr/sbin/update-alternatives --install /usr/bin/pg_config pgsql-pg_config /usr/pgsql-14/bin/pg_config 1400
+    when: not (pg_config.stdout is search('pgsql-14'))
       
 #  - name: Install psycopg2
 #    pip:
@@ -51,7 +51,7 @@
   
   - name: Ensure PostgreSQL data directory exists
     file:
-      path: "/var/lib/pgsql/13/data"
+      path: "/var/lib/pgsql/14/data"
       owner: "postgres"
       group: "postgres"
       state: directory
@@ -59,11 +59,11 @@
       
   - name: Check if PostgreSQL database is initialized
     stat:
-      path: "/var/lib/pgsql/13/data/PG_VERSION"
+      path: "/var/lib/pgsql/14/data/PG_VERSION"
     register: pgdata_dir_version
     
   - name: Ensure PostgreSQL database is initialized
-    command: "/usr/pgsql-13/bin/initdb -D /var/lib/pgsql/13/data"
+    command: "/usr/pgsql-14/bin/initdb -D /var/lib/pgsql/14/data"
     when: not pgdata_dir_version.stat.exists
     become: true
     become_user: "postgres"
@@ -83,6 +83,6 @@
   handlers:
   - name: postgresql status
     service:
-      name: postgresql-13.service
+      name: postgresql-14.service
       state: started
       enabled: yes
