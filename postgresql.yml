@@ -33,6 +33,16 @@
         - postgresql13-devel
       state: latest
       update_cache: yes
+
+  - name: check pg_config current alternatives
+    shell: alternatives --display pgsql-pg_config | grep Current | cat
+    register: pg_config
+    changed_when: false
+    ignore_errors: true
+
+  - name: ensure pg_config is set
+    command: /usr/sbin/update-alternatives --install /usr/bin/pg_config pgsql-pg_config /usr/pgsql-13/bin/pg_config 1300
+    when: not (pg_config.stdout is search('pgsql-13'))
       
   - name: Install psycopg2
     pip:
