@@ -33,7 +33,9 @@
         - postgresql14-devel
       state: latest
       update_cache: yes
-
+    notify:
+      - postgresql start
+     
   - name: check pg_config current alternatives
     shell: alternatives --display pgsql-pg_config | grep Current | cat
     register: pg_config
@@ -43,12 +45,12 @@
   - name: ensure pg_config is set
     command: /usr/sbin/update-alternatives --install /usr/bin/pg_config pgsql-pg_config /usr/pgsql-14/bin/pg_config 1400
     when: not (pg_config.stdout is search('pgsql-14'))
-      
-#  - name: Install psycopg2
-#    pip:
-#      name: psycopg2-binary
-#      state: present
-  
+
+  - name: Install psycopg2
+    yum:
+      name: python3-psycopg2
+      state: latest
+ 
   - name: Ensure PostgreSQL data directory exists
     file:
       path: "/var/lib/pgsql/14/data"
@@ -71,7 +73,10 @@
     vars:
       ansible_ssh_pipelining: true
     notify:
-      - postgresql status
+      - postgresql start
+      
+  - name: Flush Handlers
+    meta: flush_handlers
       
   - name: Create database
     postgresql_db:
@@ -79,9 +84,10 @@
       encoding: UTF-8
       template: template0
       state: present
+      login_user: "postgres"
       
   handlers:
-  - name: postgresql status
+  - name: postgresql start
     service:
       name: postgresql-14.service
       state: started
